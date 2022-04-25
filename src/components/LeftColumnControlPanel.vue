@@ -68,7 +68,7 @@ const testManipulation = () => {
       <n-upload
         v-model:file-list="fileList"
         :custom-request="uploadFileActionHandler"
-        accept=".png,.jpeg,.jgp,.bmp"
+        accept=".png,.jpeg,.jpg,.bmp"
       >
         <n-upload-dragger>
           <div class="upload-zone-container">
