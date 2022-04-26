@@ -16,7 +16,7 @@ import MiddleColumnCanvasImage from '@/components/MiddleColumnCanvasImage.vue';
 
 <style lang="scss" scoped>
 .main-container {
-  --left-column-width: 360px;
+  --left-column-width: 320px;
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -38,6 +38,7 @@ import MiddleColumnCanvasImage from '@/components/MiddleColumnCanvasImage.vue';
     overflow: hidden;
     position: relative;
     background-color: #ffffff;
+    border-right: 1px solid #e5e5e5;
 
     @media (min-width: 927px) {
       min-width: var(--left-column-width);
@@ -49,8 +50,8 @@ import MiddleColumnCanvasImage from '@/components/MiddleColumnCanvasImage.vue';
   .middle-column {
     width: 100%;
     height: 100%;
-    padding: 0.5rem;
     overflow: hidden;
+    background-color: #E5E5E5;
   }
 }
 </style>

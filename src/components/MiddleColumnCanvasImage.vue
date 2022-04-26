@@ -52,9 +52,6 @@ watch((imageEditorStore.imageList), () => {
   align-items: center;
   justify-content: center;
   overflow: auto;
-  border: 4px dashed #7B71C6;
-  border-radius: 0.7rem;
-  padding: 0.5rem;
 
   .canvas {
     max-height: 100%;

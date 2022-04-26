@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import {
-  NUpload, NUploadDragger, UploadCustomRequestOptions, UploadFileInfo,
+  NUpload, NUploadDragger, NSlider, UploadCustomRequestOptions, UploadFileInfo,
 } from 'naive-ui';
 
 import { useImageEditorStore } from '@/stores/imageEditorStore';
@@ -18,9 +18,9 @@ const uploadFileActionHandler = ({
   onProgress,
 }: UploadCustomRequestOptions): void => {
   if (file.type === 'image/png'
-  || file.type === 'image/jpg'
-  || file.type === 'image/bmp'
-  || file.type === 'image/jpeg') {
+    || file.type === 'image/jpg'
+    || file.type === 'image/bmp'
+    || file.type === 'image/jpeg') {
     onProgress({ percent: 1 });
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -55,10 +55,33 @@ const grayscaleConversionButtonHandler = () => {
   }
 };
 
-const testManipulation = () => {
-  // if (imageEditorStore.bitMapProcessing) {
-  //   imageEditorStore.bitMapProcessing.manipulationWidthImage();
-  // }
+const brightValue = ref(0);
+const marks: { [key: number]: string } = {
+  '-255': '-255',
+  0: '0',
+  255: '255',
+};
+
+const brightnessChangingButtonHandler = (valueChange: number) => {
+  if (imageEditorStore.bitMapProcessing) {
+    imageEditorStore.bitMapProcessing.brightnessChanging(valueChange);
+  }
+};
+
+watch((brightValue), newBrightValue => {
+  brightnessChangingButtonHandler(newBrightValue);
+});
+
+const imageInvertingButtonHandler = (threshold: number) => {
+  if (imageEditorStore.bitMapProcessing) {
+    imageEditorStore.bitMapProcessing.imageInverting(threshold);
+  }
+};
+
+const imageColorToBinaryButtonHandler = (threshold: number) => {
+  if (imageEditorStore.bitMapProcessing) {
+    imageEditorStore.bitMapProcessing.imageColorToBinary(threshold);
+  }
 };
 </script>
 
@@ -79,13 +102,48 @@ const testManipulation = () => {
     </div>
     <div v-if="imageEditorStore.isSelectedBitmap" class="bitmap-manipulation-container">
       <div class="manipulation">
-        <v-button type="primary" @click="grayscaleConversionButtonHandler">
-          Полутоновое изображение
+        <v-button
+          type="primary"
+          fluid
+          @click="grayscaleConversionButtonHandler"
+        >
+          Применить градацию серого
         </v-button>
       </div>
       <div class="manipulation">
-        <v-button type="primary" @click="testManipulation">
-          Инвентирование цветов
+        <div class="line" />
+        <n-slider
+          v-model:value="brightValue"
+          :min="-255"
+          :max="255"
+          :step="1"
+          :marks="marks"
+        />
+        <div class="line" />
+        <!--        <v-button-->
+        <!--          type="primary"-->
+        <!--          fluid-->
+        <!--          @click="brightnessChangingButtonHandler(10)"-->
+        <!--        >-->
+        <!--          Увеличить яркость-->
+        <!--        </v-button>-->
+      </div>
+      <div class="manipulation">
+        <v-button
+          type="primary"
+          fluid
+          @click="imageInvertingButtonHandler(70)"
+        >
+          Инвентировать цвета
+        </v-button>
+      </div>
+      <div class="manipulation">
+        <v-button
+          type="primary"
+          fluid
+          @click="imageColorToBinaryButtonHandler(70)"
+        >
+          Бинаризировать изображение
         </v-button>
       </div>
     </div>
@@ -124,6 +182,12 @@ const testManipulation = () => {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+
+    .manipulation {
+      padding: 0.5rem 0;
+      border-top: 1px solid #E5E5E5;
+      border-bottom: 1px solid #E5E5E5;
+    }
   }
 }
 </style>

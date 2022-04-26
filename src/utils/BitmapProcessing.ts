@@ -1,4 +1,5 @@
 import { Uint8ClampedArrayIterable } from '@/utils/Uint8ClampedArrayIterable';
+import { RGBA } from '@/utils/RGBA';
 
 export class BitmapProcessing {
   private readonly context: CanvasRenderingContext2D;
@@ -9,11 +10,14 @@ export class BitmapProcessing {
 
   private readonly imageData: ImageData;
 
+  private readonly imageDataOrigin: ImageData;
+
   constructor(context: CanvasRenderingContext2D, width: number, height: number) {
     this.context = context;
     this.width = width;
     this.height = height;
     this.imageData = this.context.getImageData(0, 0, this.width, this.height);
+    this.imageDataOrigin = this.context.getImageData(0, 0, this.width, this.height);
   }
 
   // colorsArrayIterator = (colors: Uint8ClampedArray) => ({
@@ -42,6 +46,15 @@ export class BitmapProcessing {
   //   },
   // });
 
+  private toByte = (colors: RGBA): RGBA => {
+    const newColors = colors;
+    for (const [key, color] of Object.entries(colors)) {
+      if (color > 255) { newColors[key] = 255; }
+      if (color < 0) { newColors[key] = 0; }
+    }
+    return newColors;
+  };
+
   grayscaleConversion = () => {
     const data = new Uint8ClampedArrayIterable(this.imageData.data);
 
@@ -56,6 +69,80 @@ export class BitmapProcessing {
     });
 
     this.context.putImageData(this.imageData, 0, 0);
+  };
+
+  grayscaleImageChecking = () => {
+    const data = new Uint8ClampedArrayIterable(this.imageData.data);
+
+    let isGrayscaleImage = true;
+    data.forEachRGBA(colors => {
+      isGrayscaleImage = colors.red === colors.green && colors.red === colors.blue;
+    });
+    return isGrayscaleImage;
+  };
+
+  brightnessChanging = (valueChange: number) => {
+    // this.imageData.data.set(this.imageDataOrigin.data);
+    const data = new Uint8ClampedArrayIterable(this.imageData.data);
+    console.log('change');
+
+    data.forEachRGBA(colors => {
+      return {
+        red: 230,
+        green: 230,
+        blue: 230,
+        alpha: colors.alpha,
+      };
+    });
+
+    this.context.putImageData(this.imageData, 0, 0);
+  };
+
+  imageInverting = (threshold: number) => {
+    const data = new Uint8ClampedArrayIterable(this.imageData.data);
+
+    data.forEachRGBA(colors => {
+      if (colors.red > threshold
+        && colors.green > threshold
+        && colors.blue > threshold) {
+        return colors;
+      }
+
+      return {
+        red: 255 - colors.red,
+        green: 255 - colors.green,
+        blue: 255 - colors.blue,
+        alpha: colors.alpha,
+      };
+    });
+
+    this.context.putImageData(this.imageData, 0, 0);
+  };
+
+  imageColorToBinary = (threshold: number) => {
+    const data = new Uint8ClampedArrayIterable(this.imageData.data);
+
+    data.forEachRGBA(colors => {
+      let newColor = 0;
+      if (colors.red > threshold
+        && colors.green > threshold
+        && colors.blue > threshold) {
+        newColor = 255;
+      }
+
+      return {
+        red: newColor,
+        green: newColor,
+        blue: newColor,
+        alpha: colors.alpha,
+      };
+    });
+
+    this.context.putImageData(this.imageData, 0, 0);
+  };
+
+  imageContrastChange = (segmentStart: number, segmentEnd: number) => {
+
   };
 
   getBrightnessHistogram = () => {

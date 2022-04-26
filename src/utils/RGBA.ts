@@ -7,6 +7,8 @@ export class RGBA {
 
   public alpha: number;
 
+  [key: string]: number;
+
   constructor(red: number, green: number, blue: number, alpha: number) {
     this.red = red;
     this.green = green;
