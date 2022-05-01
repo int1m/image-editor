@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
 import {
-  NUpload, NUploadDragger, NSlider, UploadCustomRequestOptions, UploadFileInfo,
+  NUpload, NUploadDragger, NSlider, NCollapse, NCollapseItem, UploadCustomRequestOptions, UploadFileInfo,
 } from 'naive-ui';
 
 import { useImageEditorStore } from '@/stores/imageEditorStore';
@@ -100,53 +100,52 @@ const imageColorToBinaryButtonHandler = (threshold: number) => {
         </n-upload-dragger>
       </n-upload>
     </div>
-    <div v-if="imageEditorStore.isSelectedBitmap" class="bitmap-manipulation-container">
-      <div class="manipulation">
-        <v-button
-          type="primary"
-          fluid
-          @click="grayscaleConversionButtonHandler"
-        >
-          Применить градацию серого
-        </v-button>
-      </div>
-      <div class="manipulation">
-        <div class="line" />
-        <n-slider
-          v-model:value="brightValue"
-          :min="-255"
-          :max="255"
-          :step="1"
-          :marks="marks"
-        />
-        <div class="line" />
-        <!--        <v-button-->
-        <!--          type="primary"-->
-        <!--          fluid-->
-        <!--          @click="brightnessChangingButtonHandler(10)"-->
-        <!--        >-->
-        <!--          Увеличить яркость-->
-        <!--        </v-button>-->
-      </div>
-      <div class="manipulation">
-        <v-button
-          type="primary"
-          fluid
-          @click="imageInvertingButtonHandler(70)"
-        >
-          Инвентировать цвета
-        </v-button>
-      </div>
-      <div class="manipulation">
-        <v-button
-          type="primary"
-          fluid
-          @click="imageColorToBinaryButtonHandler(70)"
-        >
-          Бинаризировать изображение
-        </v-button>
-      </div>
-    </div>
+    <n-collapse
+      v-if="imageEditorStore.isSelectedBitmap"
+      class="bitmap-manipulation-container"
+    >
+      <n-collapse-item title="Фильтры" name="1">
+        <div class="manipulation">
+          <v-button
+            type="primary"
+            fluid
+            @click="grayscaleConversionButtonHandler"
+          >
+            Применить градацию серого
+          </v-button>
+        </div>
+        <div class="manipulation">
+          <v-button
+            type="primary"
+            fluid
+            @click="imageInvertingButtonHandler(70)"
+          >
+            Инвентировать цвета
+          </v-button>
+        </div>
+        <div class="manipulation">
+          <v-button
+            type="primary"
+            fluid
+            @click="imageColorToBinaryButtonHandler(70)"
+          >
+            Бинаризировать изображение
+          </v-button>
+        </div>
+      </n-collapse-item>
+      <n-collapse-item title="Изменения" name="2">
+        <div class="manipulation">
+          <n-slider
+            v-model:value="brightValue"
+            :min="-255"
+            :max="255"
+            :step="1"
+            :marks="marks"
+            class="v-slider"
+          />
+        </div>
+      </n-collapse-item>
+    </n-collapse>
   </div>
 </template>
 
@@ -154,7 +153,7 @@ const imageColorToBinaryButtonHandler = (threshold: number) => {
 .control-panel {
   width: 100%;
   height: 100%;
-  padding: 0.5rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -185,8 +184,21 @@ const imageColorToBinaryButtonHandler = (threshold: number) => {
 
     .manipulation {
       padding: 0.5rem 0;
-      border-top: 1px solid #E5E5E5;
-      border-bottom: 1px solid #E5E5E5;
+      //border-bottom: 1px solid #E5E5E5;
+
+      :deep(.n-slider) {
+        .n-slider-rail {
+          .n-slider-rail__fill {
+            background-color: transparent;
+          }
+
+          .n-slider-dots {
+            .n-slider-dot--active {
+              border: var(--n-dot-border);
+            }
+          }
+        }
+      }
     }
   }
 }

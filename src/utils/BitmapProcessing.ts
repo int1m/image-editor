@@ -10,6 +10,8 @@ export class BitmapProcessing {
 
   private readonly imageData: ImageData;
 
+  private readonly imageDataActive: ImageData;
+
   private readonly imageDataOrigin: ImageData;
 
   constructor(context: CanvasRenderingContext2D, width: number, height: number) {
@@ -17,6 +19,7 @@ export class BitmapProcessing {
     this.width = width;
     this.height = height;
     this.imageData = this.context.getImageData(0, 0, this.width, this.height);
+    this.imageDataActive = this.context.getImageData(0, 0, this.width, this.height);
     this.imageDataOrigin = this.context.getImageData(0, 0, this.width, this.height);
   }
 
@@ -56,6 +59,7 @@ export class BitmapProcessing {
   };
 
   grayscaleConversion = () => {
+    this.imageData.data.set(this.imageDataActive.data);
     const data = new Uint8ClampedArrayIterable(this.imageData.data);
 
     data.forEachRGBA(colors => {
@@ -68,6 +72,7 @@ export class BitmapProcessing {
       };
     });
 
+    this.imageDataActive.data.set(this.imageData.data);
     this.context.putImageData(this.imageData, 0, 0);
   };
 
@@ -82,18 +87,15 @@ export class BitmapProcessing {
   };
 
   brightnessChanging = (valueChange: number) => {
-    // this.imageData.data.set(this.imageDataOrigin.data);
+    this.imageData.data.set(this.imageDataActive.data);
     const data = new Uint8ClampedArrayIterable(this.imageData.data);
-    console.log('change');
 
-    data.forEachRGBA(colors => {
-      return {
-        red: 230,
-        green: 230,
-        blue: 230,
-        alpha: colors.alpha,
-      };
-    });
+    data.forEachRGBA(colors => ({
+      red: colors.red + valueChange,
+      green: colors.green + valueChange,
+      blue: colors.blue + valueChange,
+      alpha: colors.alpha,
+    }));
 
     this.context.putImageData(this.imageData, 0, 0);
   };
