@@ -1,5 +1,6 @@
 import { Uint8ClampedArrayIterable } from '@/utils/Uint8ClampedArrayIterable';
 import { RGBA } from '@/utils/RGBA';
+import { ToolOperation } from '@/types';
 
 type GrayscaleConversionArgs = readonly [undefined];
 type GrayscaleConversion = (...args: GrayscaleConversionArgs) => void;
@@ -80,6 +81,10 @@ export class BitmapProcessing {
 
   private isEnhancementsActive = false;
 
+  private drawLineOldX: number | null = null;
+
+  private drawLineOldY: number | null = null;
+
   constructor(context: CanvasRenderingContext2D, width: number, height: number) {
     this.context = context;
     this.width = width;
@@ -149,6 +154,8 @@ export class BitmapProcessing {
     }
     return newColors;
   };
+
+  // Lab 6
 
   grayscaleConversion: GrayscaleConversion = () => {
     const data = new Uint8ClampedArrayIterable(this.imageData.data);
@@ -257,6 +264,64 @@ export class BitmapProcessing {
   };
 
   getBrightnessHistogram = () => {
-    // const colorsBuffer = this.colorsBufferSplit();
+    const data = new Uint8ClampedArrayIterable(this.imageData.data);
+    const colorsRedShades = new Array<number>(256).fill(0);
+    const colorsGreenShades = new Array<number>(256).fill(0);
+    const colorsBlueShades = new Array<number>(256).fill(0);
+
+    data.forEachRGBA(colors => {
+      colorsRedShades[colors.red] += 1;
+      colorsGreenShades[colors.green] += 1;
+      colorsBlueShades[colors.blue] += 1;
+    });
+
+    return {
+      colorsRedShades,
+      colorsGreenShades,
+      colorsBlueShades,
+    };
+  };
+
+  // Lab 7
+
+  drawLineReset = () => {
+    this.drawLineOldX = null;
+    this.drawLineOldY = null;
+  };
+
+  drawPixel = (x: number, y: number) => {
+    this.context.fillStyle = '#000000';
+    this.context.fillRect(x, y, 1, 1);
+  };
+
+  drawLine: ToolOperation = (x: number, y: number) => {
+    if (!this.drawLineOldX || !this.drawLineOldY) {
+      this.drawLineOldX = x;
+      this.drawLineOldY = y;
+    } else {
+      const dx = Math.abs(x - this.drawLineOldX);
+      const dy = Math.abs(y - this.drawLineOldY);
+      const sx = (this.drawLineOldX < x) ? 1 : -1;
+      const sy = (this.drawLineOldY < y) ? 1 : -1;
+      let error = dx - dy;
+
+      this.drawPixel(this.drawLineOldX, this.drawLineOldY);
+      while (this.drawLineOldX !== x || this.drawLineOldY !== y) {
+        const e2 = 2 * error;
+        if (e2 > dy * -1) {
+          error -= dy;
+          this.drawLineOldX += sx;
+        }
+        if (e2 < dx) {
+          error += dx;
+          this.drawLineOldY += sy;
+        }
+
+        this.drawPixel(this.drawLineOldX, this.drawLineOldY);
+      }
+
+      this.drawLineOldX = x;
+      this.drawLineOldY = y;
+    }
   };
 }

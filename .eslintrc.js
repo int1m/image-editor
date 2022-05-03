@@ -103,6 +103,7 @@ module.exports = {
 
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': ['error'],
+    "@typescript-eslint/require-await": 'off',
     'no-restricted-syntax': [
       'error',
       {

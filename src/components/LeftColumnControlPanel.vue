@@ -1,27 +1,32 @@
 <script lang="ts" setup>
 import {
   NCollapse,
+  NScrollbar,
 } from 'naive-ui';
 
 import { useImageEditorStore } from '@/stores/imageEditorStore';
 import LeftColumnControlPanelUploadImage from '@/components/LeftColumnControlPanelUploadImage.vue';
 import LeftColumnControlPanelFilters from '@/components/LeftColumnControlPanelFilters.vue';
 import LeftColumnControlPanelEnhancements from '@/components/LeftColumnControlPanelEnhancements.vue';
+import LeftColumnControlPanelHistograms from '@/components/LeftColumnControlPanelHistograms.vue';
 
 const imageEditorStore = useImageEditorStore();
 </script>
 
 <template>
-  <div class="control-panel">
-    <LeftColumnControlPanelUploadImage />
-    <n-collapse
-      v-if="imageEditorStore.isSelectedBitmap"
-      class="bitmap-manipulation-container"
-    >
-      <LeftColumnControlPanelFilters />
-      <LeftColumnControlPanelEnhancements />
-    </n-collapse>
-  </div>
+  <n-scrollbar>
+    <div class="control-panel">
+      <LeftColumnControlPanelUploadImage />
+      <n-collapse
+        v-if="imageEditorStore.isSelectedBitmap"
+        class="bitmap-manipulation-container"
+      >
+        <LeftColumnControlPanelFilters />
+        <LeftColumnControlPanelEnhancements />
+        <LeftColumnControlPanelHistograms />
+      </n-collapse>
+    </div>
+  </n-scrollbar>
 </template>
 
 <style lang="scss" scoped>
@@ -40,24 +45,6 @@ const imageEditorStore = useImageEditorStore();
 
     .manipulation {
       padding: 0.5rem 0;
-
-      .manipulation-label {
-        user-select: none;
-      }
-
-      :deep(.n-slider) {
-        .n-slider-rail {
-          .n-slider-rail__fill {
-            background-color: transparent;
-          }
-
-          .n-slider-dots {
-            .n-slider-dot--active {
-              border: var(--n-dot-border);
-            }
-          }
-        }
-      }
     }
   }
 }
